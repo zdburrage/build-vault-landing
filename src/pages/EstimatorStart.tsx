@@ -8,11 +8,9 @@ import { ArrowRight, Building2, Calculator } from "lucide-react";
 import LocationSelector from "@/components/LocationSelector";
 
 type Location = {
-  zip: string;
   city: string;
   state: string;
-  latitude: number;
-  longitude: number;
+  stateName: string;
 };
 
 const EstimatorStart = () => {
@@ -65,7 +63,7 @@ const EstimatorStart = () => {
                 onLocationSelect={setLocation}
               />
               <p className="text-sm text-gray-500 mt-2">
-                Enter a ZIP code or city name to get accurate local cost estimates
+                Enter your city and state to get accurate local cost estimates
               </p>
             </div>
 

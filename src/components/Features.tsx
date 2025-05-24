@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const features = [
@@ -38,22 +37,22 @@ const Features = () => {
   return (
     <section id="features" className="section bg-muted">
       <div className="container">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <h2 className="mb-3">Powerful Estimating Features</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
             Everything you need to create accurate estimates for storage unit construction projects
           </p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {features.map((feature, index) => (
             <Card key={index} className="feature-card">
               <CardHeader className="pb-2">
-                <div className="text-3xl mb-2">{feature.icon}</div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
+                <div className="text-2xl sm:text-3xl mb-2">{feature.icon}</div>
+                <CardTitle className="text-lg sm:text-xl">{feature.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">{feature.description}</p>
+                <p className="text-sm sm:text-base text-muted-foreground">{feature.description}</p>
               </CardContent>
             </Card>
           ))}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/select";
 
 type Location = {
+  city: string;
   state: string;
   stateName: string;
 };
@@ -73,30 +75,53 @@ interface LocationSelectorProps {
 }
 
 const LocationSelector = ({ onLocationSelect, selectedLocation }: LocationSelectorProps) => {
+  const [city, setCity] = useState(selectedLocation?.city || "");
+
+  const handleStateChange = (value: string) => {
+    const state = US_STATES.find((s) => s.state === value);
+    if (state) {
+      onLocationSelect({
+        city,
+        state: state.state,
+        stateName: state.stateName,
+      });
+    }
+  };
+
+  const handleCityChange = (value: string) => {
+    setCity(value);
+    if (selectedLocation?.state) {
+      onLocationSelect({
+        city: value,
+        state: selectedLocation.state,
+        stateName: selectedLocation.stateName,
+      });
+    }
+  };
+
   return (
-    <div className="w-[300px]">
+    <div className="flex gap-3 w-full max-w-[400px]">
+      <div className="relative flex-1">
+        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Enter city"
+          value={city}
+          onChange={(e) => handleCityChange(e.target.value)}
+          className="pl-9"
+        />
+      </div>
       <Select
         value={selectedLocation?.state}
-        onValueChange={(value) => {
-          const state = US_STATES.find((s) => s.state === value);
-          if (state) {
-            onLocationSelect(state);
-          }
-        }}
+        onValueChange={handleStateChange}
       >
-        <SelectTrigger className="w-full">
-          <MapPin className="mr-2 h-4 w-4" />
-          <SelectValue placeholder="Select a state..." />
+        <SelectTrigger className="w-[160px]">
+          <SelectValue placeholder="State" />
         </SelectTrigger>
         <SelectContent>
           {US_STATES.map((state) => (
             <SelectItem key={state.state} value={state.state}>
-              <div className="flex flex-col">
-                <span>{state.stateName}</span>
-                <span className="text-xs text-muted-foreground">
-                  {state.state}
-                </span>
-              </div>
+              {state.stateName}
             </SelectItem>
           ))}
         </SelectContent>

@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Check } from "lucide-react";
@@ -6,14 +5,15 @@ import { Check } from "lucide-react";
 const pricingPlans = [
   {
     name: "Starter",
-    price: "$79",
+    price: "$49",
     period: "/month",
-    description: "Perfect for small contractors just getting started with storage unit projects",
+    description: "Perfect for small storage facilities",
     features: [
-      "Up to 5 estimates per month",
-      "Basic material database",
-      "Standard proposal templates",
+      "Up to 5 projects",
+      "Basic cost estimation",
       "Email support",
+      "Standard templates",
+      "Basic reporting",
     ],
     buttonText: "Start Free Trial",
     buttonVariant: "outline",
@@ -21,15 +21,17 @@ const pricingPlans = [
   },
   {
     name: "Professional",
-    price: "$149",
+    price: "$99",
     period: "/month",
-    description: "Ideal for growing contractors specializing in storage unit construction",
+    description: "Ideal for growing businesses",
     features: [
-      "Unlimited estimates",
-      "Full material database with custom items",
-      "Advanced proposal templates",
-      "Project tracking & reporting",
-      "Priority email & phone support",
+      "Unlimited projects",
+      "Advanced cost estimation",
+      "Priority support",
+      "Custom templates",
+      "Advanced reporting",
+      "Team collaboration",
+      "API access",
     ],
     buttonText: "Sign Up Now",
     buttonVariant: "default",
@@ -39,13 +41,15 @@ const pricingPlans = [
     name: "Enterprise",
     price: "$299",
     period: "/month",
-    description: "For established companies with multiple storage unit projects",
+    description: "For large-scale operations",
     features: [
       "Everything in Professional",
-      "Multiple user accounts",
-      "API access for custom integrations",
       "Dedicated account manager",
-      "Training & onboarding",
+      "Custom integrations",
+      "SLA guarantees",
+      "Training sessions",
+      "Custom development",
+      "White-label options",
     ],
     buttonText: "Contact Sales",
     buttonVariant: "outline",

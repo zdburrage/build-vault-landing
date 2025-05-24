@@ -5,18 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { useLocation, useNavigate } from "react-router-dom";
+import { generateEstimate, type EstimateResponse } from "@/services/estimateService";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "sonner";
 
 type UnitType = {
   size: string;
   count: number;
-};
-
-type CostSummary = {
-  materials: number;
-  labor: number;
-  equipment: number;
-  subcontractors: number;
-  contingency: number;
 };
 
 type Step = {
@@ -32,29 +28,14 @@ const STEPS: Step[] = [
     description: "Enter the overall dimensions and unit mix for your storage facility",
   },
   {
-    id: "materials",
-    title: "Materials",
-    description: "Select materials and finishes for your project",
-  },
-  {
-    id: "labor",
-    title: "Labor Costs",
-    description: "Configure labor rates and requirements",
-  },
-  {
-    id: "equipment",
-    title: "Equipment",
-    description: "Add equipment and machinery costs",
-  },
-  {
-    id: "subcontractors",
-    title: "Subcontractors",
-    description: "Include subcontractor costs and fees",
+    id: "construction",
+    title: "Construction Details",
+    description: "Specify construction type and additional features",
   },
   {
     id: "summary",
     title: "Summary",
-    description: "Review and finalize your estimate",
+    description: "Review and generate your estimate",
   },
 ];
 
@@ -64,22 +45,24 @@ const Estimator = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [buildingWidth, setBuildingWidth] = useState(120);
   const [buildingLength, setBuildingLength] = useState(250);
+  const [stories, setStories] = useState(1);
+  const [constructionType, setConstructionType] = useState<"metal" | "concrete" | "wood">("metal");
+  const [includeClimateControl, setIncludeClimateControl] = useState(false);
+  const [optionalAddOns, setOptionalAddOns] = useState({
+    solarPanels: false,
+    elevator: false,
+    officeBuildout: false,
+  });
   const [units, setUnits] = useState<UnitType[]>([
     { size: "10×10", count: 24 },
     { size: "10×15", count: 18 },
     { size: "10×20", count: 12 },
   ]);
-  const [costSummary, setCostSummary] = useState<CostSummary>({
-    materials: 124350,
-    labor: 86200,
-    equipment: 42800,
-    subcontractors: 68500,
-    contingency: 32185,
-  });
+  const [estimate, setEstimate] = useState<EstimateResponse | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const totalUnits = units.reduce((sum, unit) => sum + unit.count, 0);
-  const subtotal = costSummary.materials + costSummary.labor + costSummary.equipment + costSummary.subcontractors;
-  const total = subtotal + costSummary.contingency;
+  const squareFootage = buildingWidth * buildingLength * stories;
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
@@ -90,6 +73,36 @@ const Estimator = () => {
   const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const handleGenerateEstimate = async () => {
+    try {
+      setIsGenerating(true);
+      const locationData = location.state?.location;
+      if (!locationData) {
+        throw new Error("Location data is required");
+      }
+
+      const request = {
+        location: locationData,
+        buildingWidth,
+        buildingLength,
+        units,
+        stories,
+        constructionType,
+        includeClimateControl,
+        optionalAddOns,
+      };
+
+      const response = await generateEstimate(request);
+      setEstimate(response);
+      toast.success("Estimate generated successfully!");
+    } catch (error) {
+      console.error("Error generating estimate:", error);
+      toast.error("Failed to generate estimate. Please try again.");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -160,8 +173,77 @@ const Estimator = () => {
         return (
           <div className="space-y-6">
             <Card className="p-6">
-              <h4 className="font-medium mb-4">Materials Selection</h4>
-              <p className="text-muted-foreground">Materials selection coming soon...</p>
+              <h4 className="font-medium mb-4">Construction Details</h4>
+              <div className="space-y-4">
+                <div>
+                  <Label>Number of Stories</Label>
+                  <Select value={stories.toString()} onValueChange={(value) => setStories(Number(value))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1">1 Story</SelectItem>
+                      <SelectItem value="2">2 Stories</SelectItem>
+                      <SelectItem value="3">3 Stories</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>Construction Type</Label>
+                  <Select value={constructionType} onValueChange={(value) => setConstructionType(value as "metal" | "concrete" | "wood")}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="metal">Metal Frame</SelectItem>
+                      <SelectItem value="concrete">Concrete</SelectItem>
+                      <SelectItem value="wood">Wood Frame</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <Label>Climate Control</Label>
+                  <Switch
+                    checked={includeClimateControl}
+                    onCheckedChange={setIncludeClimateControl}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Optional Add-ons</Label>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span>Solar Panels</span>
+                      <Switch
+                        checked={optionalAddOns.solarPanels}
+                        onCheckedChange={(checked) =>
+                          setOptionalAddOns((prev) => ({ ...prev, solarPanels: checked }))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Elevator</span>
+                      <Switch
+                        checked={optionalAddOns.elevator}
+                        onCheckedChange={(checked) =>
+                          setOptionalAddOns((prev) => ({ ...prev, elevator: checked }))
+                        }
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>Office Buildout</span>
+                      <Switch
+                        checked={optionalAddOns.officeBuildout}
+                        onCheckedChange={(checked) =>
+                          setOptionalAddOns((prev) => ({ ...prev, officeBuildout: checked }))
+                        }
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </Card>
           </div>
         );
@@ -169,35 +251,79 @@ const Estimator = () => {
         return (
           <div className="space-y-6">
             <Card className="p-6">
-              <h4 className="font-medium mb-4">Labor Costs</h4>
-              <p className="text-muted-foreground">Labor costs configuration coming soon...</p>
-            </Card>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="space-y-6">
-            <Card className="p-6">
-              <h4 className="font-medium mb-4">Equipment Costs</h4>
-              <p className="text-muted-foreground">Equipment costs coming soon...</p>
-            </Card>
-          </div>
-        );
-      case 4:
-        return (
-          <div className="space-y-6">
-            <Card className="p-6">
-              <h4 className="font-medium mb-4">Subcontractor Costs</h4>
-              <p className="text-muted-foreground">Subcontractor costs coming soon...</p>
-            </Card>
-          </div>
-        );
-      case 5:
-        return (
-          <div className="space-y-6">
-            <Card className="p-6">
-              <h4 className="font-medium mb-4">Final Summary</h4>
-              <p className="text-muted-foreground">Final summary coming soon...</p>
+              <h4 className="font-medium mb-4">Project Summary</h4>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Total Units</Label>
+                    <div className="text-lg font-medium">{totalUnits}</div>
+                  </div>
+                  <div>
+                    <Label>Square Footage</Label>
+                    <div className="text-lg font-medium">{squareFootage.toLocaleString()} sq ft</div>
+                  </div>
+                  <div>
+                    <Label>Stories</Label>
+                    <div className="text-lg font-medium">{stories}</div>
+                  </div>
+                  <div>
+                    <Label>Construction Type</Label>
+                    <div className="text-lg font-medium capitalize">{constructionType}</div>
+                  </div>
+                </div>
+
+                {estimate ? (
+                  <div className="mt-6 space-y-4">
+                    <div className="border-t pt-4">
+                      <h5 className="font-medium mb-2">Cost Estimate</h5>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>Site Preparation:</span>
+                          <span>${estimate.cost_estimate.site_prep.estimated_cost.min.toLocaleString()} - ${estimate.cost_estimate.site_prep.estimated_cost.max.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Construction:</span>
+                          <span>${estimate.cost_estimate.construction.materials_and_labor.min.toLocaleString()} - ${estimate.cost_estimate.construction.materials_and_labor.max.toLocaleString()}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>MEP Systems:</span>
+                          <span>${(estimate.cost_estimate.MEP.HVAC.min + estimate.cost_estimate.MEP.electrical.min + estimate.cost_estimate.MEP.plumbing.min).toLocaleString()} - ${(estimate.cost_estimate.MEP.HVAC.max + estimate.cost_estimate.MEP.electrical.max + estimate.cost_estimate.MEP.plumbing.max).toLocaleString()}</span>
+                        </div>
+                        <div className="border-t pt-2 mt-2 flex justify-between font-bold">
+                          <span>Total Estimate:</span>
+                          <span className="text-primary">${estimate.cost_estimate.total_estimate.min.toLocaleString()} - ${estimate.cost_estimate.total_estimate.max.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="border-t pt-4">
+                      <h5 className="font-medium mb-2">Assumptions</h5>
+                      <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
+                        {estimate.assumptions.map((assumption, index) => (
+                          <li key={index}>{assumption}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {estimate.notes && (
+                      <div className="border-t pt-4">
+                        <h5 className="font-medium mb-2">Notes</h5>
+                        <p className="text-sm text-gray-600">{estimate.notes}</p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mt-6">
+                    <Button
+                      className="w-full"
+                      onClick={handleGenerateEstimate}
+                      disabled={isGenerating}
+                    >
+                      {isGenerating ? "Generating Estimate..." : "Generate Estimate"}
+                    </Button>
+                  </div>
+                )}
+              </div>
             </Card>
           </div>
         );
@@ -212,7 +338,7 @@ const Estimator = () => {
       <div className="bg-primary h-12 flex items-center px-4 text-white">
         <div className="font-medium">BuildVault Estimator</div>
         <div className="ml-auto flex items-center gap-4">
-          <span className="text-sm">Project: Storage Complex #247</span>
+          <span className="text-sm">Project: {location.state?.projectName || "New Project"}</span>
           <span className="bg-secondary text-white text-xs px-2 py-1 rounded">DRAFT</span>
         </div>
       </div>
@@ -275,38 +401,36 @@ const Estimator = () => {
         <div className="w-64 border-l border-gray-200 p-4 bg-white">
           <div className="flex items-center gap-2 mb-4">
             <MapPin className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Texas</span>
+            <span className="text-sm font-medium">
+              {location.state?.location?.city}, {location.state?.location?.state}
+            </span>
           </div>
-          <div className="text-sm font-medium text-gray-700 mb-3">Cost Summary</div>
+          <div className="text-sm font-medium text-gray-700 mb-3">Project Summary</div>
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
-              <span className="text-gray-600">Materials:</span>
-              <span>${costSummary.materials.toLocaleString()}</span>
+              <span className="text-gray-600">Total Units:</span>
+              <span>{totalUnits}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Labor:</span>
-              <span>${costSummary.labor.toLocaleString()}</span>
+              <span className="text-gray-600">Square Footage:</span>
+              <span>{squareFootage.toLocaleString()} sq ft</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Equipment:</span>
-              <span>${costSummary.equipment.toLocaleString()}</span>
+              <span className="text-gray-600">Stories:</span>
+              <span>{stories}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-600">Subcontractors:</span>
-              <span>${costSummary.subcontractors.toLocaleString()}</span>
+              <span className="text-gray-600">Construction:</span>
+              <span className="capitalize">{constructionType}</span>
             </div>
-            <div className="border-t pt-2 mt-2 flex justify-between font-medium">
-              <span>Subtotal:</span>
-              <span>${subtotal.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>Contingency (10%):</span>
-              <span>${costSummary.contingency.toLocaleString()}</span>
-            </div>
-            <div className="border-t pt-2 mt-2 flex justify-between font-bold">
-              <span>Total Estimate:</span>
-              <span className="text-primary">${total.toLocaleString()}</span>
-            </div>
+            {estimate && (
+              <div className="border-t pt-2 mt-2 flex justify-between font-bold">
+                <span>Total Estimate:</span>
+                <span className="text-primary">
+                  ${estimate.cost_estimate.total_estimate.min.toLocaleString()} - ${estimate.cost_estimate.total_estimate.max.toLocaleString()}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

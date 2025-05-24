@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MapPin } from "lucide-react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -16,20 +15,75 @@ import {
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 
 const Hero = () => {
   const [userType, setUserType] = useState<"contractor" | "developer">("contractor");
-  const [location, setLocation] = useState("Select location");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+
+  const states = [
+    { value: "AL", label: "Alabama" },
+    { value: "AK", label: "Alaska" },
+    { value: "AZ", label: "Arizona" },
+    { value: "AR", label: "Arkansas" },
+    { value: "CA", label: "California" },
+    { value: "CO", label: "Colorado" },
+    { value: "CT", label: "Connecticut" },
+    { value: "DE", label: "Delaware" },
+    { value: "FL", label: "Florida" },
+    { value: "GA", label: "Georgia" },
+    { value: "HI", label: "Hawaii" },
+    { value: "ID", label: "Idaho" },
+    { value: "IL", label: "Illinois" },
+    { value: "IN", label: "Indiana" },
+    { value: "IA", label: "Iowa" },
+    { value: "KS", label: "Kansas" },
+    { value: "KY", label: "Kentucky" },
+    { value: "LA", label: "Louisiana" },
+    { value: "ME", label: "Maine" },
+    { value: "MD", label: "Maryland" },
+    { value: "MA", label: "Massachusetts" },
+    { value: "MI", label: "Michigan" },
+    { value: "MN", label: "Minnesota" },
+    { value: "MS", label: "Mississippi" },
+    { value: "MO", label: "Missouri" },
+    { value: "MT", label: "Montana" },
+    { value: "NE", label: "Nebraska" },
+    { value: "NV", label: "Nevada" },
+    { value: "NH", label: "New Hampshire" },
+    { value: "NJ", label: "New Jersey" },
+    { value: "NM", label: "New Mexico" },
+    { value: "NY", label: "New York" },
+    { value: "NC", label: "North Carolina" },
+    { value: "ND", label: "North Dakota" },
+    { value: "OH", label: "Ohio" },
+    { value: "OK", label: "Oklahoma" },
+    { value: "OR", label: "Oregon" },
+    { value: "PA", label: "Pennsylvania" },
+    { value: "RI", label: "Rhode Island" },
+    { value: "SC", label: "South Carolina" },
+    { value: "SD", label: "South Dakota" },
+    { value: "TN", label: "Tennessee" },
+    { value: "TX", label: "Texas" },
+    { value: "UT", label: "Utah" },
+    { value: "VT", label: "Vermont" },
+    { value: "VA", label: "Virginia" },
+    { value: "WA", label: "Washington" },
+    { value: "WV", label: "West Virginia" },
+    { value: "WI", label: "Wisconsin" },
+    { value: "WY", label: "Wyoming" },
+  ];
 
   return (
-    <section className="relative py-20 md:py-32 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 -z-10" />
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-12">
-          <div className="flex justify-center mb-6">
+    <section className="relative py-20 md:py-32 overflow-hidden w-full max-w-full">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-blue-100 -z-10 w-full max-w-full" />
+      <div className="container mx-auto px-0 sm:px-4 relative z-10 w-full max-w-full">
+        <div className="max-w-3xl mx-auto text-center mb-12 w-full px-2">
+          <div className="flex justify-center mb-6 w-full">
             <Tabs 
               defaultValue="contractor" 
-              className="w-[400px]"
+              className="w-full max-w-xs sm:max-w-md"
               onValueChange={(value) => setUserType(value as "contractor" | "developer")}
             >
               <TabsList className="grid w-full grid-cols-2">
@@ -49,21 +103,28 @@ const Hero = () => {
               : "The complete platform that helps developers evaluate costs, compare contractors, and track project expenses for storage facility investments."}
           </p>
           
-          <div className="flex flex-col sm:flex-row justify-center gap-4 items-center">
-            <div className="w-full sm:w-auto mb-4 sm:mb-0">
-              <Select onValueChange={setLocation}>
-                <SelectTrigger className="w-full sm:w-[200px] bg-white">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-primary" />
-                    <SelectValue placeholder="Select location" />
-                  </div>
+          <div className="flex flex-col sm:flex-row justify-center gap-4 items-center w-full">
+            <div className="w-full sm:w-auto mb-4 sm:mb-0 flex gap-2">
+              <div className="relative flex-1 w-full">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Enter city"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  className="pl-9 w-[200px]"
+                />
+              </div>
+              <Select value={state} onValueChange={setState}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="State" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="texas">Texas</SelectItem>
-                  <SelectItem value="florida">Florida</SelectItem>
-                  <SelectItem value="california">California</SelectItem>
-                  <SelectItem value="new_york">New York</SelectItem>
-                  <SelectItem value="ohio">Ohio</SelectItem>
+                  {states.map((state) => (
+                    <SelectItem key={state.value} value={state.value}>
+                      {state.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -78,53 +139,53 @@ const Hero = () => {
           </div>
         </div>
         
-        <div className="mt-12 relative max-w-4xl mx-auto">
-          <div className="bg-white p-2 rounded-xl shadow-2xl border">
+        <div className="mt-8 sm:mt-12 relative max-w-4xl mx-auto">
+          <div className="bg-white p-2 sm:p-4 rounded-xl shadow-2xl border">
             <AspectRatio ratio={16/9} className="rounded-lg overflow-hidden">
               <div className="w-full h-full bg-white">
                 {/* Mocked Screenshot of Estimation Page */}
                 <div className="h-full flex flex-col">
                   {/* Header */}
-                  <div className="bg-primary h-12 flex items-center px-4 text-white">
-                    <div className="font-medium">BuildVault Estimator</div>
-                    <div className="ml-auto flex items-center gap-4">
-                      <span className="text-sm">Project: Storage Complex #247</span>
-                      <span className="bg-secondary text-white text-xs px-2 py-1 rounded">DRAFT</span>
+                  <div className="bg-primary h-10 sm:h-12 flex items-center px-3 sm:px-4 text-white">
+                    <div className="font-medium text-sm sm:text-base">BuildVault Estimator</div>
+                    <div className="ml-auto flex items-center gap-2 sm:gap-4">
+                      <span className="text-xs sm:text-sm">Project: Storage Complex #247</span>
+                      <span className="bg-secondary text-white text-xs px-2 py-0.5 sm:py-1 rounded">DRAFT</span>
                     </div>
                   </div>
                   
                   {/* Content Area */}
                   <div className="flex flex-1">
                     {/* Sidebar */}
-                    <div className="w-48 bg-gray-100 p-3 border-r border-gray-200">
-                      <div className="text-sm font-medium text-gray-700 mb-2">Project Sections</div>
+                    <div className="w-32 sm:w-48 bg-gray-100 p-2 sm:p-3 border-r border-gray-200">
+                      <div className="text-xs sm:text-sm font-medium text-gray-700 mb-2">Project Sections</div>
                       <div className="space-y-1">
-                        <div className="bg-primary/10 text-primary px-2 py-1 rounded text-sm">Building Dimensions</div>
-                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-sm">Materials</div>
-                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-sm">Labor Costs</div>
-                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-sm">Equipment</div>
-                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-sm">Subcontractors</div>
-                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-sm">Summary</div>
+                        <div className="bg-primary/10 text-primary px-2 py-1 rounded text-xs sm:text-sm">Building Dimensions</div>
+                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-xs sm:text-sm">Materials</div>
+                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-xs sm:text-sm">Labor Costs</div>
+                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-xs sm:text-sm">Equipment</div>
+                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-xs sm:text-sm">Subcontractors</div>
+                        <div className="text-gray-600 hover:bg-gray-200 px-2 py-1 rounded text-xs sm:text-sm">Summary</div>
                       </div>
                     </div>
                     
                     {/* Main Content */}
-                    <div className="flex-1 p-4">
-                      <h3 className="text-lg font-semibold mb-4">Building Dimensions</h3>
+                    <div className="flex-1 p-3 sm:p-4">
+                      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Building Dimensions</h3>
                       
-                      <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="border rounded p-3 bg-gray-50">
-                          <div className="text-sm text-gray-500 mb-1">Building Width</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <div className="border rounded p-2 sm:p-3 bg-gray-50">
+                          <div className="text-xs sm:text-sm text-gray-500 mb-1">Building Width</div>
                           <div className="flex items-center">
-                            <div className="text-xl font-medium">120</div>
-                            <div className="ml-1 text-gray-500">ft</div>
+                            <div className="text-lg sm:text-xl font-medium">120</div>
+                            <div className="ml-1 text-xs sm:text-sm text-gray-500">ft</div>
                           </div>
                         </div>
-                        <div className="border rounded p-3 bg-gray-50">
-                          <div className="text-sm text-gray-500 mb-1">Building Length</div>
+                        <div className="border rounded p-2 sm:p-3 bg-gray-50">
+                          <div className="text-xs sm:text-sm text-gray-500 mb-1">Building Length</div>
                           <div className="flex items-center">
-                            <div className="text-xl font-medium">250</div>
-                            <div className="ml-1 text-gray-500">ft</div>
+                            <div className="text-lg sm:text-xl font-medium">250</div>
+                            <div className="ml-1 text-xs sm:text-sm text-gray-500">ft</div>
                           </div>
                         </div>
                       </div>

@@ -1,12 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '@workos-inc/authkit-react';
-import { Calculator, Building2, User, CreditCard } from "lucide-react";
+import { Calculator, User, CreditCard, Menu, X } from "lucide-react";
+import { useState } from "react";
+import bvLogo from "@/assets/bv_transparent.png";
 
 const Navbar = () => {
   const { user, signIn, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handleSectionClick = (sectionId: string) => {
     if (location.pathname !== '/') {
@@ -19,16 +22,17 @@ const Navbar = () => {
         element.scrollIntoView({ behavior: 'smooth' });
       }
     }
+    setIsMobileMenuOpen(false);
   };
 
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-sm bg-white/80 border-b">
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <Link to="/" className="flex items-center gap-2">
-          <Building2 className="h-6 w-6 text-primary" />
-          <span className="font-semibold text-lg">BuildVault</span>
+          <img src={bvLogo} alt="BuildVault Logo" className="h-32 w-auto" />
         </Link>
 
+        {/* Desktop Navigation */}
         <div className="hidden md:flex space-x-8">
           <button
             onClick={() => handleSectionClick('features')}
@@ -62,7 +66,60 @@ const Navbar = () => {
           </button>
         </div>
 
-        <div className="flex items-center gap-4">
+        {/* Mobile Menu Button */}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+        >
+          {isMobileMenuOpen ? (
+            <X className="h-6 w-6" />
+          ) : (
+            <Menu className="h-6 w-6" />
+          )}
+        </Button>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="absolute top-16 left-0 right-0 bg-white border-b md:hidden">
+            <div className="container py-4 space-y-4">
+              <button
+                onClick={() => handleSectionClick('features')}
+                className="block w-full text-left px-4 py-2 text-foreground hover:text-primary transition-colors"
+              >
+                Features
+              </button>
+              <button
+                onClick={() => handleSectionClick('how-it-works')}
+                className="block w-full text-left px-4 py-2 text-foreground hover:text-primary transition-colors"
+              >
+                How It Works
+              </button>
+              <button
+                onClick={() => handleSectionClick('pricing')}
+                className="block w-full text-left px-4 py-2 text-foreground hover:text-primary transition-colors"
+              >
+                Pricing
+              </button>
+              <button
+                onClick={() => handleSectionClick('testimonials')}
+                className="block w-full text-left px-4 py-2 text-foreground hover:text-primary transition-colors"
+              >
+                Testimonials
+              </button>
+              <button
+                onClick={() => handleSectionClick('faq')}
+                className="block w-full text-left px-4 py-2 text-foreground hover:text-primary transition-colors"
+              >
+                FAQ
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Right-side navigation (Profile, Subscription, etc.) */}
+        <div className="hidden md:flex items-center gap-4">
           {user ? (
             <>
               <Button asChild>
