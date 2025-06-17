@@ -104,7 +104,8 @@ export type EstimateRequest = {
 
 export async function generateEstimate(request: EstimateRequest): Promise<EstimateResponse> {
   try {
-    const response = await fetch("http://localhost:3001/api/openai/assistant", {
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+    const response = await fetch(`${apiUrl}/api/openai/assistant`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

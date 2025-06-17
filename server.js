@@ -8,6 +8,10 @@ dotenv.config();
 
 const apiKey = process.env.OPENAI_API_KEY || process.env.VITE_OPENAI_API_KEY;
 const assistantId = process.env.OPENAI_ASSISTANT_ID || process.env.VITE_OPENAI_ASSISTANT_ID;
+const port = process.env.PORT || 3001;
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',') 
+  : ['http://localhost:8080', 'http://127.0.0.1:8080'];
 
 if (!apiKey || !assistantId) {
   console.error('Missing required environment variables. Please set either:');
@@ -17,11 +21,10 @@ if (!apiKey || !assistantId) {
 }
 
 const app = express();
-const port = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:8080', 'http://127.0.0.1:8080'],
+  origin: allowedOrigins,
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -44,4 +47,5 @@ app.post('/api/openai/assistant', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
   console.log('Environment variables loaded successfully');
+  console.log('Allowed origins:', allowedOrigins);
 }); 
