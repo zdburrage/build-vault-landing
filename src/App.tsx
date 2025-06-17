@@ -51,19 +51,11 @@ const AppContent = () => {
         />
         <Route
           path="/estimator"
-          element={
-            <ProtectedRoute>
-              <Estimator />
-            </ProtectedRoute>
-          }
+          element={<Estimator />}
         />
         <Route
           path="/estimator/start"
-          element={
-            <ProtectedRoute>
-              <EstimatorStart />
-            </ProtectedRoute>
-          }
+          element={<EstimatorStart />}
         />
         <Route
           path="/profile"

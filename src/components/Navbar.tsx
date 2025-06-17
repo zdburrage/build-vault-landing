@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '@workos-inc/authkit-react';
-import { Calculator, User, CreditCard, Menu, X } from "lucide-react";
+import { Calculator, Menu, X } from "lucide-react";
 import { useState } from "react";
 import bvLogo from "@/assets/bv_transparent.png";
 
@@ -118,37 +118,14 @@ const Navbar = () => {
           </div>
         )}
 
-        {/* Right-side navigation (Profile, Subscription, etc.) */}
+        {/* Right-side navigation */}
         <div className="hidden md:flex items-center gap-4">
-          {user ? (
-            <>
-              <Button asChild>
-                <Link to="/estimator/start" className="flex items-center gap-2">
-                  <Calculator className="h-4 w-4" />
-                  Start Estimating
-                </Link>
-              </Button>
-              <div className="flex items-center gap-2">
-                <Link to="/profile">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    Profile
-                  </Button>
-                </Link>
-                <Link to="/subscription">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-2">
-                    <CreditCard className="h-4 w-4" />
-                    Subscription
-                  </Button>
-                </Link>
-                <Button variant="outline" size="sm" onClick={() => signOut()}>
-                  Sign Out
-                </Button>
-              </div>
-            </>
-          ) : (
-            <Button onClick={() => signIn()}>Sign In</Button>
-          )}
+          <Button asChild>
+            <Link to="/estimator/start" className="flex items-center gap-2">
+              <Calculator className="h-4 w-4" />
+              Start Estimating
+            </Link>
+          </Button>
         </div>
       </div>
     </nav>

@@ -169,7 +169,9 @@ export async function generateEstimate(request: EstimateRequest): Promise<Estima
             "string", "string"
           ],
           "notes": "string"
-        }`
+        }
+
+        IMPORTANT: Respond ONLY with the JSON object, no additional text or formatting.`
       })
     });
 
@@ -179,11 +181,14 @@ export async function generateEstimate(request: EstimateRequest): Promise<Estima
 
     const data = await response.json();
     
-    // Clean up the response content by removing markdown formatting
-    const content = data.content.replace(/```json\n?|\n?```/g, '').trim();
-    
-    // Parse the cleaned content as JSON
-    const estimateData = JSON.parse(content);
+    // Extract JSON from the response content
+    const jsonMatch = data.content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error("Invalid response format: No JSON object found");
+    }
+
+    // Parse the extracted JSON
+    const estimateData = JSON.parse(jsonMatch[0]);
     return EstimateResponseSchema.parse(estimateData);
   } catch (error) {
     console.error("Error generating estimate:", error);

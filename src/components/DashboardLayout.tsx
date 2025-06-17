@@ -4,11 +4,8 @@ import { useAuth } from "@workos-inc/authkit-react";
 import {
   Building2,
   Calculator,
-  CreditCard,
   FileText,
   Home,
-  Settings,
-  User,
 } from "lucide-react";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -20,9 +17,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     { name: "Estimator", href: "/estimator/start", icon: Calculator },
     { name: "Projects", href: "/projects", icon: Building2 },
     { name: "Reports", href: "/reports", icon: FileText },
-    { name: "Subscription", href: "/subscription", icon: CreditCard },
-    { name: "Profile", href: "/profile", icon: User },
-    { name: "Settings", href: "/settings", icon: Settings },
   ];
 
   return (
@@ -34,12 +28,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <Building2 className="h-6 w-6 text-primary" />
             <span className="font-semibold text-lg">BuildVault</span>
           </Link>
-
-          <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" onClick={() => signOut()}>
-              Sign Out
-            </Button>
-          </div>
         </div>
       </nav>
 
